@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<description
+ xmlns="http://openoffice.org/extensions/description/2006"
+ xmlns:dep="http://openoffice.org/extensions/description/2006"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<identifier value="sci.ponomar.cuconverter"/>
+	<version value="2.0.0"/>
+	   <display-name>
+		<name lang="en">Church Slavic codepage converter</name>
+		<name lang="ru">Конвертер церковнославянских кодировок</name>
+		<name lang="cu">Конве́ртеръ церковнословѣ́нскїхъ кодирѡ́вокъ</name>
+	    </display-name>
+	    <publisher>
+		<name xlink:href="http://sci.ponomar.net/" lang="en">Slavonic Computing Initiative</name>
+		<name xlink:href="http://sci.ponomar.net/" lang="ru">Инициативная группа славянской информатики</name>
+	       <name xlink:href="http://sci.ponomar.net/" lang="cu">И҆ницїати́внаѧ грꙋ́ппа словѣ́нскагѡ и҆сполне́нїѧ</name>
+	    </publisher>
+	<registration>
+		<simple-license  accept-by="admin" default-license-id="ID0" suppress-on-update="true" >
+			<license-text xlink:href="LICENSE" lang="en" license-id="ID0" />
+			<license-text xlink:href="LICENSE" lang="en-US" />
+			<license-text xlink:href="RULICENSE.txt" lang="ru-RU" />
+			<license-text xlink:href="RULICENSE.txt" lang="cu-RU" />
+		</simple-license>
+	</registration>
+</description>

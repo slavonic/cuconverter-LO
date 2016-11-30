@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oor:component-data 
+ xmlns:oor="http://openoffice.org/2001/registry"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ oor:name="Addons"
+ oor:package="org.openoffice.Office">
+	<node oor:name="AddonUI">
+		<node oor:name="AddonMenu">
+				<node oor:name="Ponomar.AddonMenu.m001" oor:op="replace">
+					<prop oor:name="Context" oor:type="xs:string">
+						<value>com.sun.star.text.TextDocument</value>
+					</prop>
+					<prop oor:name="ImageIdentifier" oor:type="xs:string">
+						<value>%origin%/icons/image1</value>
+					</prop>
+					<prop oor:name="Title" oor:type="xs:string">
+						<value>Church Slavonic Conversion</value>
+						<value xml:lang="en-US">Church Slavonic Conversion</value>
+						<value xml:lang="ru-RU">Конвертация ЦСЯ</value>
+					</prop>
+					<node oor:name="Submenu">
+						<node oor:name="Ponomar.AddonMenu.m002" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>vnd.sun.star.script:Ponomar.CuConverter.HIPToUnicode?language=Basic&amp;location=application</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value>HIP to Unicode</value>
+								<value xml:lang="en-US">HIP to Unicode</value>
+								<value xml:lang="ru-RU">Из HIP в Юникод</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+						</node>
+						<node oor:name="Ponomar.AddonMenu.m003" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>vnd.sun.star.script:Ponomar.CuConverter.UcsToUnicode?language=Basic&amp;location=application</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value>UCS to Unicode</value>
+								<value xml:lang="en-US">UCS to Unicode</value>
+								<value xml:lang="ru-RU">Из UCS в Юникод</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+						</node>
+						<node oor:name="Ponomar.AddonMenu.m004" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>vnd.sun.star.script:Ponomar.CuConverter.CyrTimesOld2Unicode?language=Basic&amp;location=application</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value>OldCyrillic to Unicode</value>
+								<value xml:lang="en-US">OldCyrillic to Unicode</value>
+								<value xml:lang="ru-RU">Из шрифта OldCyrillic в Юникод</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+						</node>
+					</node>
+				</node>
+		</node>
+	</node>
+</oor:component-data>

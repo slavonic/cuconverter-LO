@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CuConverter" script:language="StarBasic">REM  *****  BASIC  *****
+Option Explicit
+REM UcsToUnicode converts text from Unified Church Slavonic (UCS) to Unicode
+REM Copyright 2011, 2013, 2016 Aleksandr Andreev
+REM This code is part of the Ponomar Project. Please see http://www.ponomar.net/
+REM Licensed under the MIT License
+
+Private Sub Convert(aFind As Array, aReplace As Array)
+	Dim oDoc As Object
+	On Error GoTo Leave
+	oDoc = ThisComponent
+
+	Dim FandR
+	FandR = oDoc.createReplaceDescriptor
+	FandR.SearchCaseSensitive = true
+	FandR.SearchRegularExpression = false
+	
+	Rem Try to figure out if we have a selection. If not use the whole document
+    Dim oCtrl as Object
+    oCtrl = oDoc.CurrentController
+    Dim oVC as Object
+    oVC = oCtrl.getViewCursor()
+    Dim sSel As String
+    sSel = oVC.getString()
+
+	Dim i as Integer
+	While i &lt;= uBound(aFind)
+		FandR.setSearchString(aFind(i))
+		FandR.setReplaceString(aReplace(i))
+		If sSel = &quot;&quot; Then
+			oDoc.ReplaceAll(FandR)
+		Else
+			sSel = Replace(sSel, aFind(i), aReplace(i))
+		End If
+		i = i + 1
+		DoEvents
+	Wend
+
+	Rem If we were dealing with a selection, write it back to the doc
+	If sSel &lt;&gt; &quot;&quot; Then
+		oVC.setString(sSel)
+		oVC = oCtrl.getViewCursor()
+	    Dim oTxtCur as Object
+		oTxtCur = oDoc.Text.createTextCursorByRange(oVC)
+		oTxtCur.collapseToStart()
+	    oVC.gotoRange(oTxtCur, False)
+	End If
+	
+	MsgBox(&quot;Conversion completed.&quot;)
+    GoTo Done
+    
+    Leave:
+    	MsgBox(&quot;An error occured.&quot;)
+    Done:
+End Sub
+
+Sub UcsToUnicode
+	Dim aFind, aReplace
+	
+	Rem Array of UCS Entities
+	aFind = Array(&quot;і&quot;, &quot;у&quot;, &quot;!&quot;, &quot;#&quot;, &quot;$&quot;, &quot;%&quot;, &quot;&amp;&quot;, &quot;(&quot;, &quot;)&quot;, &quot;*&quot;, &quot;+&quot;, &quot;,&quot;, &quot;-&quot;, &quot;.&quot;, &quot;/&quot;, &quot;0&quot;, &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, _
+  		&quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;:&quot;, &quot;;&quot;, &quot;&lt;&quot;, &quot;=&quot;, &quot;&gt;&quot;, &quot;?&quot;, &quot;@&quot;, &quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, _
+  		&quot;G&quot;, &quot;H&quot;, &quot;I&quot;, &quot;J&quot;, &quot;K&quot;, &quot;L&quot;, &quot;M&quot;, &quot;N&quot;, &quot;O&quot;, &quot;P&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;S&quot;, &quot;T&quot;, &quot;U&quot;, &quot;V&quot;, &quot;W&quot;, &quot;X&quot;, &quot;Y&quot;, _
+  		&quot;Z&quot;, &quot;[&quot;, &quot;\&quot;, &quot;]&quot;, &quot;^&quot;, &quot;_&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;, &quot;f&quot;, &quot;g&quot;, &quot;h&quot;, &quot;i&quot;, &quot;j&quot;, &quot;k&quot;, &quot;l&quot;, &quot;m&quot;, _
+  		&quot;n&quot;, &quot;o&quot;, &quot;p&quot;, &quot;q&quot;, &quot;r&quot;, &quot;s&quot;, &quot;t&quot;, &quot;u&quot;, &quot;v&quot;, &quot;w&quot;, &quot;x&quot;, &quot;y&quot;, &quot;z&quot;, &quot;{&quot;, &quot;|&quot;, &quot;}&quot;, &quot;~&quot;, &quot;Ђ&quot;, &quot;Ѓ&quot;, _
+  		&quot;‚&quot;, &quot;ѓ&quot;, &quot;„&quot;, &quot;…&quot;, &quot;†&quot;, &quot;‡&quot;, &quot;€&quot;, &quot;‰&quot;, &quot;Љ&quot;, &quot;‹&quot;, &quot;Њ&quot;, &quot;Ќ&quot;, &quot;Ћ&quot;, &quot;Џ&quot;, &quot;ђ&quot;, &quot;‘&quot;, &quot;’&quot;, &quot;“&quot;, &quot;”&quot;, _
+  		&quot;•&quot;, &quot;–&quot;, &quot;—&quot;, &quot;™&quot;, &quot;љ&quot;, &quot;›&quot;, &quot;њ&quot;, &quot;ќ&quot;, &quot;ћ&quot;, &quot;џ&quot;, &quot;Ў&quot;, &quot;ў&quot;, &quot;Ј&quot;, &quot;¤&quot;, &quot;Ґ&quot;, &quot;¦&quot;, &quot;§&quot;, &quot;Ё&quot;, &quot;©&quot;, _
+  		&quot;«&quot;, &quot;¬&quot;, &quot;®&quot;, &quot;Ї&quot;, &quot;°&quot;, &quot;±&quot;, &quot;І&quot;, &quot;ґ&quot;, &quot;µ&quot;, &quot;¶&quot;, &quot;·&quot;, &quot;ё&quot;, &quot;№&quot;, &quot;є&quot;, &quot;»&quot;, &quot;ј&quot;, &quot;Ѕ&quot;, &quot;ѕ&quot;, _
+  		&quot;ї&quot;, &quot;А&quot;, &quot;Б&quot;, &quot;В&quot;, &quot;Г&quot;, &quot;Д&quot;, &quot;Е&quot;, &quot;Ж&quot;, &quot;З&quot;, &quot;И&quot;, &quot;Й&quot;, &quot;К&quot;, &quot;Л&quot;, &quot;М&quot;, &quot;Н&quot;, &quot;О&quot;, &quot;П&quot;, &quot;Р&quot;, &quot;С&quot;, _
+  		&quot;Т&quot;, &quot;У&quot;, &quot;Ф&quot;, &quot;Х&quot;, &quot;Ц&quot;, &quot;Ч&quot;, &quot;Ш&quot;, &quot;Щ&quot;, &quot;Ъ&quot;, &quot;Ы&quot;, &quot;Ь&quot;, &quot;Э&quot;, &quot;Ю&quot;, &quot;Я&quot;, &quot;а&quot;, &quot;б&quot;, &quot;в&quot;, &quot;г&quot;, &quot;д&quot;, _
+  		&quot;е&quot;, &quot;ж&quot;, &quot;з&quot;, &quot;и&quot;, &quot;й&quot;, &quot;к&quot;, &quot;л&quot;, &quot;м&quot;, &quot;н&quot;, &quot;о&quot;, &quot;п&quot;, &quot;р&quot;, &quot;с&quot;, &quot;т&quot;, &quot;ф&quot;, &quot;х&quot;, &quot;ц&quot;, &quot;ч&quot;, _
+  		&quot;ш&quot;, &quot;щ&quot;, &quot;ъ&quot;, &quot;ы&quot;, &quot;ь&quot;, &quot;э&quot;, &quot;ю&quot;, &quot;я&quot;)
+	
+	Rem Array of Unicode Equivalents
+	aReplace = Array(chr(&amp;H0456) &amp; chr(&amp;H0308), chr(&amp;HA64B), chr(&amp;H0021), chr(&amp;H0486), chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H0486) &amp; chr(&amp;H0300), chr(&amp;H0483), chr(&amp;H0028), chr(&amp;H0029), chr(&amp;HA673), chr(&amp;H2DE1) &amp; chr(&amp;H0487), chr(&amp;H002C), chr(&amp;H002D), chr(&amp;H002E), chr(&amp;H002F), chr(&amp;H043E) &amp; chr(&amp;H0301), chr(&amp;H0301), chr(&amp;H0300), chr(&amp;H0486), _
+	    chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H0486) &amp; chr(&amp;H0300), chr(&amp;H0311), chr(&amp;H0483), chr(&amp;H033E), chr(&amp;H0436) &amp; chr(&amp;H0483), chr(&amp;H003A), chr(&amp;H003B), chr(&amp;H2DEF), chr(&amp;H2DE9) &amp; chr(&amp;H0487), chr(&amp;H2DEC) &amp; chr(&amp;H0487), chr(&amp;H2DF1) &amp; chr(&amp;H0487), chr(&amp;H0300), chr(&amp;H0430) &amp; chr(&amp;H0300), chr(&amp;H0463) &amp; chr(&amp;H0311), chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H0434) &amp; chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H0435) &amp; chr(&amp;H0300), chr(&amp;H0472), _
+	    chr(&amp;H0433) &amp; chr(&amp;H0483), chr(&amp;H0461) &amp; chr(&amp;H0301), chr(&amp;H0406), chr(&amp;H0456) &amp; chr(&amp;H0300), chr(&amp;HA656) &amp; chr(&amp;H0486), chr(&amp;H043B) &amp; chr(&amp;H2DE3), chr(&amp;H0476), chr(&amp;H047A) &amp; chr(&amp;H0486), chr(&amp;H047A), chr(&amp;H0470), chr(&amp;H047C), chr(&amp;H0440) &amp; chr(&amp;H0483), chr(&amp;H0467) &amp; chr(&amp;H0300), chr(&amp;H047E), chr(&amp;H041E) &amp; chr(&amp;H0443), chr(&amp;H0474), chr(&amp;H0460), chr(&amp;H046E), chr(&amp;HA64B) &amp; chr(&amp;H0300), _
+	    chr(&amp;H0466), chr(&amp;H005B), chr(&amp;H0483), chr(&amp;H005D), chr(&amp;H0311), chr(&amp;H033E), chr(&amp;H0430) &amp; chr(&amp;H0301), chr(&amp;H2DEA) &amp; chr(&amp;H0487), chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H2DE3), chr(&amp;H0435) &amp; chr(&amp;H0301), chr(&amp;H0473), chr(&amp;H2DE2) &amp; chr(&amp;H0487), chr(&amp;H044B) &amp; chr(&amp;H0301), chr(&amp;H0456), chr(&amp;H0456) &amp; chr(&amp;H0301), chr(&amp;HA657) &amp; chr(&amp;H0486), chr(&amp;H043B) &amp; chr(&amp;H0483), chr(&amp;H0477), _
+	    chr(&amp;H047B) &amp; chr(&amp;H0486), chr(&amp;H047B), chr(&amp;H0471), chr(&amp;H047D), chr(&amp;H0440) &amp; chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H0467) &amp; chr(&amp;H0301), chr(&amp;H047F), chr(&amp;H1C82) &amp; chr(&amp;H0443), chr(&amp;H0475), chr(&amp;H0461), chr(&amp;H046F), chr(&amp;HA64B) &amp; chr(&amp;H0301), chr(&amp;H0467), chr(&amp;HA64B) &amp; chr(&amp;H0311), chr(&amp;H0467) &amp; chr(&amp;H0486) &amp; chr(&amp;H0300), chr(&amp;H0438) &amp; chr(&amp;H0483), chr(&amp;H0301), chr(&amp;H0475) &amp; chr(&amp;H0301), chr(&amp;H0410) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), _
+	    chr(&amp;H201A), chr(&amp;H0430) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H201E), chr(&amp;H046F) &amp; chr(&amp;H0483), chr(&amp;H0430) &amp; chr(&amp;H0311), chr(&amp;H0456) &amp; chr(&amp;H0311), chr(&amp;H2DE5), chr(&amp;H0467) &amp; chr(&amp;H0311), chr(&amp;H0466) &amp; chr(&amp;H0486), chr(&amp;H0456) &amp; chr(&amp;H0483), chr(&amp;H0460) &amp; chr(&amp;H0486), chr(&amp;H041E) &amp; chr(&amp;H0443) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;HA656) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H047A) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H0475) &amp; chr(&amp;H2DE2) &amp; chr(&amp;H0487), chr(&amp;H2018), chr(&amp;H2019), chr(&amp;H201C), chr(&amp;H201D), _
+	    chr(&amp;H2DE4), chr(&amp;H2013), chr(&amp;H2014), chr(&amp;H0442) &amp; chr(&amp;H0483), chr(&amp;H0467) &amp; chr(&amp;H0486), chr(&amp;H0475) &amp; chr(&amp;H0311), chr(&amp;H0461) &amp; chr(&amp;H0486), chr(&amp;H1C82) &amp; chr(&amp;H0443) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;HA657) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H047B) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H041E) &amp; chr(&amp;H0443) &amp; chr(&amp;H0486), chr(&amp;H1C82) &amp; chr(&amp;H0443) &amp; chr(&amp;H0486), chr(&amp;H0406) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H0482), chr(&amp;H0410) &amp; chr(&amp;H0486), chr(&amp;H0445) &amp; chr(&amp;H0483), chr(&amp;H0447) &amp; chr(&amp;H0483), chr(&amp;H0463) &amp; chr(&amp;H0300), chr(&amp;H0441) &amp; chr(&amp;H0483), _
+	    chr(&amp;H00AB), chr(&amp;H00AC), chr(&amp;H0440) &amp; chr(&amp;H2DE3), chr(&amp;H0406) &amp; chr(&amp;H0486), chr(&amp;HA67E), chr(&amp;HA657) &amp; chr(&amp;H0486) &amp; chr(&amp;H0300), chr(&amp;H0406), chr(&amp;H0430) &amp; chr(&amp;H0486), chr(&amp;H0443), chr(&amp;H00B6), chr(&amp;H00B7), chr(&amp;H0463) &amp; chr(&amp;H0301), chr(&amp;H0430) &amp; chr(&amp;H0483), chr(&amp;H0454), chr(&amp;H00BB), chr(&amp;H0456) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301), chr(&amp;H0405), chr(&amp;H0455), _
+	    chr(&amp;H0456) &amp; chr(&amp;H0486), chr(&amp;H0410), chr(&amp;H0411), chr(&amp;H0412), chr(&amp;H0413), chr(&amp;H0414), chr(&amp;H0415), chr(&amp;H0416), chr(&amp;H0417), chr(&amp;H0418), chr(&amp;H0419), chr(&amp;H041A), chr(&amp;H041B), chr(&amp;H041C), chr(&amp;H041D), chr(&amp;H041E), chr(&amp;H041F), chr(&amp;H0420), chr(&amp;H0421), _
+	    chr(&amp;H0422), chr(&amp;H0423), chr(&amp;H0424), chr(&amp;H0425), chr(&amp;H0426), chr(&amp;H0427), chr(&amp;H0428), chr(&amp;H0429), chr(&amp;H042A), chr(&amp;H042B), chr(&amp;H042C), chr(&amp;H0462), chr(&amp;H042E), chr(&amp;HA656), chr(&amp;H0430), chr(&amp;H0431), chr(&amp;H0432), chr(&amp;H0433), chr(&amp;H0434), _
+	    chr(&amp;H0435), chr(&amp;H0436), chr(&amp;H0437), chr(&amp;H0438), chr(&amp;H0439), chr(&amp;H043A), chr(&amp;H043B), chr(&amp;H043C), chr(&amp;H043D), chr(&amp;H043E), chr(&amp;H043F), chr(&amp;H0440), chr(&amp;H0441), chr(&amp;H0442), chr(&amp;H0444), chr(&amp;H0445), chr(&amp;H0446), chr(&amp;H0447), _
+	    chr(&amp;H0448), chr(&amp;H0449), chr(&amp;H044A), chr(&amp;H044B), chr(&amp;H044C), chr(&amp;H0463), chr(&amp;H044E), chr(&amp;HA657) )
+	Convert(aFind, aReplace)	
+End Sub
+
+Sub LegacyOCSToUnicode
+Rem This code converts some encodings used by Nikita Simmons
+	Dim aFind, aReplace
+	aFind = Array(&quot;⁄&quot;, &quot;9&quot;, &quot;0&quot;, &quot; &quot;, &quot;2&quot;, &quot;1&quot;, &quot;¯&quot;, &quot;œ&quot;, &quot;˛&quot;, &quot;^&quot;, &quot;&quot;&quot;&quot;, &quot;A&quot;, &quot;B&quot;, &quot;V&quot;, &quot;G&quot;, &quot;D&quot;, &quot;d&quot;, &quot;E&quot;, &quot;J&quot;, &quot;Z&quot;, &quot;I&quot;, &quot;Á&quot;, &quot;K&quot;, &quot;L&quot;, &quot;M&quot;, &quot;N&quot;, &quot;O&quot;, &quot;O¨&quot;, &quot;P&quot;, &quot;R&quot;, &quot;S&quot;, &quot;T&quot;, &quot;F&quot;, &quot;H&quot;, &quot;C&quot;, &quot;Ç&quot;, &quot;W&quot;, &quot;„&quot;, &quot;Q&quot;, &quot;Y&quot;, &quot;|&quot;, &quot;¿&quot;, &quot;a&quot;, &quot;b&quot;, &quot;v&quot;, &quot;g&quot;, &quot;˝&quot;, &quot;e&quot;, &quot;j&quot;, &quot;z&quot;, &quot;i&quot;, &quot;¥&quot;, &quot;k&quot;, &quot;l&quot;, &quot;m&quot;, &quot;n&quot;, &quot;o&quot;, &quot;ï&quot;, &quot;º&quot;, &quot;p&quot;, &quot;r&quot;, &quot;s&quot;, &quot;t&quot;, &quot;¨&quot;, &quot;f&quot;, &quot;h&quot;, &quot;c&quot;, &quot;ç&quot;, &quot;w&quot;, &quot;∑&quot;, &quot;q&quot;, &quot;y&quot;, &quot;\&quot;, &quot;÷&quot;, &quot;´&quot;, &quot;≈&quot;, &quot;6&quot;, &quot;&apos;&quot;, &quot;}&quot;, &quot;]&quot;, &quot;?&quot;, &quot;/&quot;, &quot;≠&quot;, &quot;—&quot;, &quot;–&quot;, &quot;{&quot;, &quot;[&quot;, &quot;·&quot;, &quot;ª&quot;, &quot;Æ&quot;, &quot;æ&quot;, &quot;Ú&quot;, &quot;…&quot;, &quot;X&quot;, &quot;x&quot;, &quot;∏&quot;, &quot;π&quot;, &quot;Ï&quot;, &quot;ƒ&quot;, &quot;»&quot;, &quot;«&quot;, &quot;»◊&quot;, &quot;«ı&quot;, &quot;Ø&quot;, &quot;ø&quot;, &quot;&amp;&quot;, &quot;7&quot;, &quot;ˇ&quot;, &quot;†&quot;, &quot;&quot;, &quot;≤&quot;, &quot;`&quot;, &quot;¡&quot;, &quot;™&quot;, &quot;£&quot;, &quot;¢&quot;, &quot;∞&quot;, &quot;∫&quot;, &quot;√&quot;, &quot;©&quot;, &quot;∂&quot;, &quot;∆&quot;, &quot;.=.&quot;, &quot;˚&quot;, &quot;¬&quot;, &quot;µ&quot;, &quot;˜&quot;, &quot;’&quot;, &quot;*&quot;, &quot;®&quot;, &quot;ß&quot;, &quot;±&quot;, &quot;˙&quot;, &quot;)&quot;, &quot;(&quot;, &quot;_&quot;, &quot;.+.&quot;, &quot;‰&quot;, &quot;Î&quot;, &quot;“&quot;, &quot;Œ&quot;, &quot;¸&quot;, &quot;Ω&quot;, &quot;U&quot;, &quot;u&quot;, &quot;}&quot;, &quot;‘&quot;, &quot;Å&quot;, &quot;å&quot;, &quot;8&quot;, &quot;ı&quot;, &quot;•&quot;, &quot;ﬂ&quot;, &quot;ˆ&quot;, &quot;‡&quot;, &quot;â&quot;, &quot;ê&quot;, &quot;î&quot;, &quot;Ô&quot;, &quot;Ü&quot;, &quot;ü&quot;, &quot;”&quot;, &quot;‘4&quot;, &quot;%&quot;, &quot;5&quot;, &quot;¶&quot;, &quot;¤&quot;, &quot;‹&quot;, &quot;›&quot;, &quot;ﬁ&quot;, &quot;!&quot;, &quot;@&quot;, &quot;˘&quot;, &quot;~&quot;, &quot;3&quot;, &quot;#&quot;, &quot;4&quot;, &quot;$&quot;, &quot;&lt;&quot;, &quot;≥&quot;, &quot;&gt;&quot;, &quot;Í&quot;)
+
+	aReplace = Array(chr(&amp;H0021),  chr(&amp;H0028),  chr(&amp;H0029),  chr(&amp;H202F),  chr(&amp;H0300),  chr(&amp;H0301),  chr(&amp;H0311),  chr(&amp;H033E),  chr(&amp;H0405),  chr(&amp;H0406),  chr(&amp;H0407),  chr(&amp;H0410),  chr(&amp;H0411),  chr(&amp;H0412),  chr(&amp;H0413),  chr(&amp;H0414),  chr(&amp;H1C81),  chr(&amp;H0415), _
+chr(&amp;H0416),  chr(&amp;H0417),  chr(&amp;H0418),  chr(&amp;H0419),  chr(&amp;H041A),  chr(&amp;H041B),  chr(&amp;H041C),  chr(&amp;H041D),  chr(&amp;H041E), _
+ chr(&amp;H041E),  chr(&amp;H041F),  chr(&amp;H0420),  chr(&amp;H0421),  chr(&amp;H0422),  chr(&amp;H0424),  chr(&amp;H0425),  chr(&amp;H0426),  chr(&amp;H0427), _
+ chr(&amp;H0428),  chr(&amp;H0429),  chr(&amp;H042A),  chr(&amp;H042B),  chr(&amp;H042C),  chr(&amp;H042E),  chr(&amp;H0430),  chr(&amp;H0431),  chr(&amp;H0432), _
+ chr(&amp;H0433),  chr(&amp;H0434),  chr(&amp;H0435),  chr(&amp;H0436),  chr(&amp;H0437),  chr(&amp;H0438),  chr(&amp;H0439),  chr(&amp;H043A),  chr(&amp;H043B), _
+ chr(&amp;H043C),  chr(&amp;H043D),  chr(&amp;H043E),  chr(&amp;H043E),  chr(&amp;H1C82),  chr(&amp;H043F),  chr(&amp;H0440),  chr(&amp;H0441),  chr(&amp;H0442), _
+ chr(&amp;H0443),  chr(&amp;H0444),  chr(&amp;H0445),  chr(&amp;H0446),  chr(&amp;H0447),  chr(&amp;H0448),  chr(&amp;H0449),  chr(&amp;H044A),  chr(&amp;H044B), _
+ chr(&amp;H044C),  chr(&amp;H044E),  chr(&amp;H0454),  chr(&amp;H0455),  chr(&amp;H0456),  chr(&amp;H0457),  chr(&amp;H0460),  chr(&amp;H0461),  chr(&amp;H0462), _
+  chr(&amp;H0463),  chr(&amp;H1C87),  chr(&amp;H0464),  chr(&amp;H0465),  chr(&amp;H0466),  chr(&amp;H0467),  chr(&amp;H0468),  chr(&amp;H0469),  chr(&amp;H046A), _
+  chr(&amp;H046B),  chr(&amp;H046C),  chr(&amp;H046D),  chr(&amp;H046E),  chr(&amp;H046F),  chr(&amp;H0470),  chr(&amp;H0471),  chr(&amp;H0472),  chr(&amp;H0473), _
+ chr(&amp;H0474),  chr(&amp;H0475),  chr(&amp;H0476),  chr(&amp;H0477),  chr(&amp;H047A),  chr(&amp;H047B),  chr(&amp;H047C),  chr(&amp;H047D),  chr(&amp;H047E), _
+  chr(&amp;H047F),  chr(&amp;H0482),  chr(&amp;H0483),  chr(&amp;H0486),  &quot;🕀&quot;, &quot;🕁&quot;,  &quot;🕂&quot;, &quot;🕃&quot;,  &quot;🕄&quot;, _
+  chr(&amp;H2DE0) &amp; chr(&amp;H0487),  chr(&amp;H2DE1) &amp; chr(&amp;H0487),  chr(&amp;H2DE2) &amp; chr(&amp;H0487),  chr(&amp;H2DE3),  chr(&amp;H2DE4),  chr(&amp;H2DE5), _
+  chr(&amp;H2DE6) &amp; chr(&amp;H0487),  chr(&amp;H2DE7) &amp; chr(&amp;H0487),  chr(&amp;H2DE8),  chr(&amp;H2DE9) &amp; chr(&amp;H0487),  chr(&amp;H2DEA) &amp; chr(&amp;H0487), _
+  chr(&amp;H2DEB) &amp; chr(&amp;H0487),  chr(&amp;H2DEC) &amp; chr(&amp;H0487),  chr(&amp;H2DED) &amp; chr(&amp;H0487),  chr(&amp;H2DEE),  chr(&amp;H2DEF),  chr(&amp;H2DF0) &amp; chr(&amp;H0487), _
+  chr(&amp;H2DF1) &amp; chr(&amp;H0487),  chr(&amp;H2DF2) &amp; chr(&amp;H0487),  chr(&amp;H2DF3) &amp; chr(&amp;H0487),  chr(&amp;H2DF4),  chr(&amp;H2DED) &amp; chr(&amp;H2DEE),  chr(&amp;H2DFD) &amp; chr(&amp;H0487),  chr(&amp;H2E2F),  chr(&amp;HA640),  chr(&amp;HA641),  chr(&amp;HA64A),  chr(&amp;HA64B), _
+  chr(&amp;HA64C),  chr(&amp;HA64D),  chr(&amp;HA656),  chr(&amp;HA657),  chr(&amp;HA673),  chr(&amp;HA675),  chr(&amp;HA67C),  chr(&amp;H0406) &amp; chr(&amp;H0486), _
+ chr(&amp;H0456) &amp; chr(&amp;H0486),  chr(&amp;H0406) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301),  chr(&amp;H0456) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301),  chr(&amp;H0456) &amp; chr(&amp;H0301), _
+  chr(&amp;H0456) &amp; chr(&amp;H0311),  chr(&amp;H0456) &amp; chr(&amp;H0483),  chr(&amp;HA64B) &amp; chr(&amp;H0301),  chr(&amp;HA64B) &amp; chr(&amp;H0300),  chr(&amp;HA64B) &amp; chr(&amp;H0311), _
+  chr(&amp;HA64D) &amp; chr(&amp;H0486) &amp; chr(&amp;H0300),  chr(&amp;H047E) &amp; chr(&amp;H0301),  chr(&amp;H047F) &amp; chr(&amp;H0301),  chr(&amp;H0426),  chr(&amp;H0463) &amp; chr(&amp;H0301), _
+ chr(&amp;H0463) &amp; chr(&amp;H0300),  chr(&amp;H0463) &amp; chr(&amp;H0486) &amp; chr(&amp;H0301),  chr(&amp;H0463) &amp; chr(&amp;H0311),  chr(&amp;H0301), _
+  chr(&amp;H0300),  chr(&amp;H0311),  chr(&amp;H0486),  chr(&amp;H0486) &amp; chr(&amp;H0301),  chr(&amp;H0486) &amp; chr(&amp;H0301),  chr(&amp;H0486) &amp; chr(&amp;H0300), _
+  chr(&amp;H0486) &amp; chr(&amp;H0300),  chr(&amp;H0483),  chr(&amp;H0483),  chr(&amp;H0483),  chr(&amp;H2DED) &amp; chr(&amp;H0487))
+
+	Convert(aFind, aReplace)  
+End Sub
+
+Sub CyrTimesOld2Unicode
+Rem This code converts text in the legacy CyrillicTimesOld font
+Rem This font was used on some machines in the USA in the 90s
+	Dim aFind, aReplace
+	
+	Rem Array of the Rows of the keyboard
+	aFind = Array(&quot;`&quot;, &quot;=&quot;, _
+		&quot;q&quot;, &quot;w&quot;, &quot;e&quot;, &quot;r&quot;, &quot;t&quot;, &quot;y&quot;, &quot;u&quot;, &quot;i&quot;, &quot;o&quot;, &quot;p&quot;, &quot;[&quot;, &quot;]&quot;, &quot;\&quot;, _
+		&quot;a&quot;, &quot;s&quot;, &quot;d&quot;, &quot;f&quot;, &quot;g&quot;, &quot;h&quot;, &quot;j&quot;, &quot;k&quot;, &quot;l&quot;, &quot;;&quot;, &quot;&apos;&quot;, _
+		&quot;z&quot;, &quot;x&quot;, &quot;c&quot;, &quot;v&quot;, &quot;b&quot;, &quot;n&quot;, &quot;m&quot;, &quot;/&quot;, _
+		&quot;~&quot;, &quot;!&quot;, &quot;@&quot;, &quot;#&quot;, &quot;$&quot;, &quot;%&quot;, &quot;^&quot;, &quot;&amp;&quot;, &quot;*&quot;, &quot;_&quot;, &quot;+&quot;, _
+		&quot;Q&quot;, &quot;W&quot;, &quot;E&quot;, &quot;R&quot;, &quot;T&quot;, &quot;Y&quot;, &quot;U&quot;, &quot;I&quot;, &quot;O&quot;, &quot;P&quot;, &quot;{&quot;, &quot;}&quot;, &quot;|&quot;, _
+		&quot;A&quot;, &quot;S&quot;, &quot;D&quot;, &quot;F&quot;, &quot;G&quot;, &quot;H&quot;, &quot;J&quot;, &quot;K&quot;, &quot;L&quot;, &quot;:&quot;, &quot;&quot;&quot;&quot;, _
+		&quot;Z&quot;, &quot;X&quot;, &quot;C&quot;, &quot;V&quot;, &quot;B&quot;, &quot;N&quot;, &quot;M&quot;, &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;?&quot;)
+	
+	Rem Array of font mappings
+	aReplace = Array(&quot;?&quot;, &quot;ц&quot;, _
+		&quot;й&quot;, &quot;і&quot;, &quot;у&quot;, &quot;к&quot;, &quot;е&quot;, &quot;н&quot;, &quot;г&quot;, &quot;ш&quot;, &quot;щ&quot;, &quot;з&quot;, &quot;ю&quot;, &quot;ъ&quot;, &quot;ѣ&quot;, _
+		&quot;ф&quot;, &quot;ы&quot;, &quot;в&quot;, &quot;а&quot;, &quot;п&quot;, &quot;р&quot;, &quot;о&quot;, &quot;л&quot;, &quot;д&quot;, &quot;х&quot;, &quot;ж&quot;, _
+		&quot;я&quot;, &quot;ч&quot;, &quot;с&quot;, &quot;м&quot;, &quot;и&quot;, &quot;т&quot;, &quot;ь&quot;, &quot;б&quot;, _
+		&quot;/&quot;, &quot;!&quot;, &quot;$&quot;, chr(&amp;H2626), &quot;ѳ&quot;, &quot;%&quot;, &quot;э&quot;, &quot;№&quot;, &quot;ѵ&quot;, chr(&amp;H2015), &quot;Ц&quot;, _
+		&quot;Й&quot;, &quot;І&quot;, &quot;У&quot;, &quot;К&quot;, &quot;Е&quot;, &quot;Н&quot;, &quot;Г&quot;, &quot;Ш&quot;, &quot;Щ&quot;, &quot;З&quot;, &quot;Ю&quot;, &quot;Ъ&quot;, &quot;Ѣ&quot;, _
+		&quot;Ф&quot;, &quot;Ы&quot;, &quot;В&quot;, &quot;А&quot;, &quot;П&quot;, &quot;Р&quot;, &quot;О&quot;, &quot;Л&quot;, &quot;Д&quot;, &quot;Х&quot;, &quot;Ж&quot;, _
+		&quot;Я&quot;, &quot;Ч&quot;, &quot;С&quot;, &quot;М&quot;, &quot;И&quot;, &quot;Т&quot;, &quot;Ь&quot;, &quot;;&quot;, &quot;:&quot;, &quot;Б&quot;)
+
+	Convert(aFind, aReplace)	
+End Sub
+
+Sub HIPToUnicode
+	Rem This code converts HIP to Unicode
+	Rem Warning! LO cannot handle numbers higher than 0xFFFF, so chars in SMP NOT supported
+	Dim aFind, aReplace
+	
+	aFind = Array(&quot;A&quot;, &quot;a&quot;, &quot;B&quot;, &quot;b&quot;, &quot;E&quot;, &quot;e&quot;, &quot;K&quot;, &quot;k&quot;, &quot;M&quot;, &quot;m&quot;, &quot;H&quot;, &quot;h&quot;, &quot;O&quot;, &quot;o&quot;, &quot;P&quot;, &quot;p&quot;, &quot;C&quot;, &quot;c&quot;, &quot;T&quot;, &quot;t&quot;, &quot;Y&quot;, &quot;y&quot;, &quot;X&quot;, &quot;x&quot;, &quot;І&quot;, &quot;і&quot;, &quot;jь&quot;, &quot;Jь&quot;, &quot;JЬ&quot;, &quot;&lt;кс&gt;&quot;, &quot;&lt;КС&gt;&quot;, &quot;&lt;Кс&gt;&quot;, &quot;ju&quot;, &quot;&lt;е&gt;&quot;, &quot;&lt;Е&gt;&quot;, &quot;s&quot;, &quot;S&quot;, &quot;v&quot;&quot;&quot;, &quot;V&quot;&quot;&quot;, &quot;v&quot;, &quot;V&quot;, &quot;f&quot;, &quot;F&quot;, &quot;u&quot;, &quot;&lt;i&gt;&quot;, &quot;_i&quot;, &quot;i&quot;, &quot;&lt;i_&gt;&quot;, &quot;_е&quot;, &quot;_Е&quot;, &quot;_кс&quot;, &quot;_КС&quot;, &quot;_Кс&quot;, &quot;&lt;о&gt;&quot;, &quot;&lt;О&gt;&quot;, &quot;_о&quot;, &quot;_О&quot;, &quot;w\т&quot;, &quot;W\т&quot;, &quot;W\Т&quot;, &quot;&lt;w&gt;&quot;, &quot;&lt;W&gt;&quot;, &quot;_w&quot;, &quot;_W&quot;, &quot;w&quot;, &quot;W&quot;, &quot;&lt;пс&gt;&quot;, &quot;&lt;ПС&gt;&quot;, &quot;&lt;Пс&gt;&quot;, &quot;_пс&quot;, &quot;_ПС&quot;, &quot;_Пс&quot;, &quot;о&lt;у&gt;&quot;, &quot;о_у&quot;, &quot;О&lt;у&gt;&quot;, &quot;О_у&quot;, &quot;&lt;у&gt;&quot;, &quot;_у&quot;, &quot;у&quot;, &quot;У&quot;, &quot;jа&quot;, &quot;JА&quot;, &quot;Jа&quot;, &quot;я&quot;, &quot;Я&quot;, &quot;&lt;а&gt;&quot;, &quot;&lt;г&gt;&quot;, &quot;&lt;Г&gt;&quot;, &quot;&lt;д&gt;&quot;, &quot;&lt;дг&gt;&quot;, &quot;&lt;ДГ&gt;&quot;, &quot;&lt;дж&gt;&quot;, &quot;&lt;ДЖ&gt;&quot;, &quot;jе&quot;, &quot;JЕ&quot;, &quot;Jе&quot;, &quot;jjь&quot;, &quot;JJЬ&quot;, &quot;&lt;jь&gt;&quot;, &quot;&lt;/jь&gt;&quot;, &quot;&lt;sг&gt;&quot;, &quot;&lt;s-&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;з&gt;&quot;, &quot;g&quot;, &quot;&lt;лг&gt;&quot;, &quot;&lt;нг&gt;&quot;, &quot;&lt;оо&gt;&quot;, &quot;&lt;о+&gt;&quot;, &quot;&lt;о.о.&gt;&quot;, &quot;&lt;о.&gt;&quot;, &quot;&lt;о:&gt;&quot;, &quot;&lt;о_&gt;&quot;, &quot;&lt;_w&gt;&quot;, &quot;&lt;с&gt;&quot;, &quot;&lt;т&gt;&quot;, &quot;&lt;|т|&gt;&quot;, &quot;&lt;оv&gt;&quot;, &quot;&lt;ч&gt;&quot;, &quot;q&quot;, &quot;&lt;ъ&gt;&quot;, &quot;&lt;ы&gt;&quot;, &quot;&lt;ьi_&gt;&quot;, &quot;&lt;ъi_&gt;&quot;, &quot;&lt;ьи&gt;&quot;, &quot;&lt;ъи&gt;&quot;, &quot;&lt;ь-i&gt;&quot;, &quot;&lt;ъ-i&gt;&quot;, &quot;&lt;ь-i_&gt;&quot;, &quot;&lt;ъ-i_&gt;&quot;, &quot;&lt;ь-и&gt;&quot;, &quot;&lt;ъ-и&gt;&quot;, &quot;э&quot;, &quot;Э&quot;, &quot;&lt;ю&gt;&quot;, &quot;ю@&quot;, &quot;I&quot;, &quot;&lt;jа&gt;&quot;, &quot;jя&quot;, &quot;&lt;яu&gt;&quot;, &quot;&lt;я.&gt;&quot;, &quot;&lt;я&gt;&quot;, &quot;&lt;я_&gt;&quot;, &quot;&lt;u&gt;&quot;, &quot;&lt;ын&gt;&quot;, &quot;=&quot;, &quot;&apos;&quot;, &quot;^&quot;, &quot;`&quot;, &quot;~&quot;, &quot;&quot;&quot;&quot;, &quot;\ъ&quot;, &quot;\Ъ&quot;, &quot;\б&quot;, &quot;\Б&quot;, &quot;\в&quot;, &quot;\В&quot;, &quot;\г&quot;, &quot;\Г&quot;, &quot;\д&quot;, &quot;\Д&quot;, &quot;\ж&quot;, &quot;\Ж&quot;, &quot;\з&quot;, &quot;\З&quot;, &quot;\к&quot;, &quot;\К&quot;, &quot;\л&quot;, &quot;\Л&quot;, &quot;\м&quot;, &quot;\М&quot;, &quot;\н&quot;, &quot;\Н&quot;, &quot;\о&quot;, &quot;\О&quot;, &quot;\п&quot;, &quot;\П&quot;, &quot;\р&quot;, &quot;\Р&quot;, &quot;\с&quot;, &quot;\С&quot;, &quot;\т&quot;, &quot;\Т&quot;, &quot;\х&quot;, &quot;\Х&quot;, &quot;\ф&quot;, &quot;\Ф&quot;, &quot;\ц&quot;, &quot;\Ц&quot;, &quot;\ч&quot;, &quot;\Ч&quot;, &quot;\ш&quot;, &quot;\Ш&quot;, &quot;\щ&quot;, &quot;\Щ&quot;, &quot;\f&quot;, &quot;\F&quot;, &quot;\а&quot;, &quot;\А&quot;, &quot;\е&quot;, &quot;\Е&quot;, &quot;\g&quot;, &quot;\G&quot;, &quot;\у&quot;, &quot;\У&quot;, &quot;\jе&quot;, &quot;\ю&quot;, &quot;\Ю&quot;, &quot;\jа&quot;, &quot;\я&quot;, &quot;\Я&quot;, &quot;\u&quot;, &quot;\U&quot;, &quot;\ju&quot;, &quot;\и&quot;, &quot;\И&quot;, &quot;\^&quot;, &quot;\-&quot;, &quot;#&quot;, &quot;@&quot;, &quot;+&quot;, &quot;*&quot;, &quot;&lt;*&gt;&quot;, &quot;&lt;тьматем&gt;&quot;, &quot;&lt;-&gt;&quot;, &quot;&lt;тьма&gt;&amp;&quot;, &quot;&lt;легион&gt;&amp;&quot;, &quot;&lt;леодр&gt;&amp;&quot;, &quot;&lt;вран&gt;&amp;&quot;, &quot;&lt;колода&gt;&amp;&quot;, &quot;&lt;&gt;&quot;, &quot;_/&quot;, &quot;&lt;_&gt;&quot;, &quot;__&quot;, &quot;&lt;|&gt;&quot;, &quot;&amp;&quot;, &quot;%-&quot;, &quot;&lt;((&gt;&quot;, &quot;&lt;))&gt;&quot;)
+	aReplace = Array(chr(&amp;H0410), chr(&amp;H0430), chr(&amp;H0412), chr(&amp;H0432), chr(&amp;H0045), chr(&amp;H0435), chr(&amp;H041A), chr(&amp;H043A), chr(&amp;H041C), chr(&amp;H043C), chr(&amp;H041D), chr(&amp;H043D), chr(&amp;H041E), chr(&amp;H043E), chr(&amp;H0420), chr(&amp;H0440), chr(&amp;H0421), chr(&amp;H0441), chr(&amp;H0422), chr(&amp;H0442), chr(&amp;H0423), chr(&amp;H0443), chr(&amp;H0425), chr(&amp;H0445), chr(&amp;H0049), chr(&amp;H0069), chr(&amp;H0463), chr(&amp;H0462), chr(&amp;H0462), chr(&amp;H046F), chr(&amp;H046E), chr(&amp;H046E), chr(&amp;H046D), chr(&amp;H0454), chr(&amp;H0404), chr(&amp;H0455), chr(&amp;H0405), chr(&amp;H0477), chr(&amp;H0476), chr(&amp;H0475), chr(&amp;H0474), chr(&amp;H0473), chr(&amp;H0472), chr(&amp;H046B), chr(&amp;H0456), chr(&amp;HF8FF), chr(&amp;H0456), chr(&amp;HA647), chr(&amp;H0454), chr(&amp;H0404), chr(&amp;H046F), chr(&amp;H046E), chr(&amp;H046E), chr(&amp;H047B), chr(&amp;H047A), chr(&amp;H047B), chr(&amp;H047A), chr(&amp;H047F), chr(&amp;H047E), chr(&amp;H047E), chr(&amp;H047D), chr(&amp;H047C), chr(&amp;H047D), chr(&amp;H047C), chr(&amp;H0461), chr(&amp;H0460), chr(&amp;H0471), chr(&amp;H0470), chr(&amp;H0470), chr(&amp;H0471), chr(&amp;H0470), chr(&amp;H0470), chr(&amp;H1C82) &amp; chr(&amp;H0443), chr(&amp;H1C82) &amp; chr(&amp;H0443), chr(&amp;H041E) &amp; chr(&amp;H0443), chr(&amp;H041E) &amp; chr(&amp;H0443), chr(&amp;H0443), chr(&amp;H0443), chr(&amp;HA64B), chr(&amp;HA64A), chr(&amp;HA657), chr(&amp;HA656), chr(&amp;HA656), chr(&amp;H0467), chr(&amp;H0466), chr(&amp;HFFFD), chr(&amp;H0491), chr(&amp;H0490), chr(&amp;H1C81), chr(&amp;HA663), chr(&amp;HA662), chr(&amp;H045F), chr(&amp;H040F), chr(&amp;H0465), chr(&amp;H0464), chr(&amp;H0464), chr(&amp;HA653), chr(&amp;HA652), chr(&amp;H1C87), chr(&amp;HFFFD), chr(&amp;HA643), chr(&amp;HA643), chr(&amp;HA645), chr(&amp;HA641), chr(&amp;HA649), chr(&amp;HA665), chr(&amp;H04A5), chr(&amp;HA699), chr(&amp;HA69B), chr(&amp;HA66D), chr(&amp;HA669), chr(&amp;HA66B), chr(&amp;H1C82), chr(&amp;HA64D), chr(&amp;H1C83), chr(&amp;H1C84), chr(&amp;H1C85), chr(&amp;H1C88), chr(&amp;H0447), chr(&amp;H0481), chr(&amp;H1C86), chr(&amp;HA651), chr(&amp;H044C) &amp; chr(&amp;HA647), chr(&amp;H044A) &amp; chr(&amp;HA647), chr(&amp;H044C) &amp; chr(&amp;H0438), chr(&amp;H044A) &amp; chr(&amp;H0438), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;H044D), chr(&amp;H042D), chr(&amp;HA655), chr(&amp;H044E) &amp; chr(&amp;H0306), chr(&amp;H0406), chr(&amp;HA657), chr(&amp;H0469), chr(&amp;HA65B), chr(&amp;HFFFD), chr(&amp;HA659), chr(&amp;HFFFD), chr(&amp;HFFFD), chr(&amp;HA65F), chr(&amp;H0486), chr(&amp;H0301), chr(&amp;H0311), chr(&amp;H0300), chr(&amp;H0483), chr(&amp;H030F), chr(&amp;H033E), chr(&amp;H033E), chr(&amp;H2DE0) &amp; chr(&amp;H0487), chr(&amp;H2DE0) &amp; chr(&amp;H0487), chr(&amp;H2DE1) &amp; chr(&amp;H0487), chr(&amp;H2DE1) &amp; chr(&amp;H0487), chr(&amp;H2DE2) &amp; chr(&amp;H0487), chr(&amp;H2DE2) &amp; chr(&amp;H0487), chr(&amp;H2DE3), chr(&amp;H2DE3), chr(&amp;H2DE4), chr(&amp;H2DE4), chr(&amp;H2DE5), chr(&amp;H2DE5), chr(&amp;H2DE6) &amp; chr(&amp;H0487), chr(&amp;H2DE6) &amp; chr(&amp;H0487), chr(&amp;H2DE7) &amp; chr(&amp;H0487), chr(&amp;H2DE7) &amp; chr(&amp;H0487), chr(&amp;H2DE8), chr(&amp;H2DE8), chr(&amp;H2DE9) &amp; chr(&amp;H0487), chr(&amp;H2DE9) &amp; chr(&amp;H0487), chr(&amp;H2DEA) &amp; chr(&amp;H0487), chr(&amp;H2DEA) &amp; chr(&amp;H0487), chr(&amp;H2DEB), chr(&amp;H2DE8), chr(&amp;H2DEC) &amp; chr(&amp;H0487), chr(&amp;H2DEC) &amp; chr(&amp;H0487), chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H2DED) &amp; chr(&amp;H0487), chr(&amp;H2DEE), chr(&amp;H2DEE), chr(&amp;H2DEF), chr(&amp;H2DEF), chr(&amp;HA69E) &amp; chr(&amp;H0487), chr(&amp;HA69E) &amp; chr(&amp;H0487), chr(&amp;H2DF0), chr(&amp;H2DF0), chr(&amp;H2DF1) &amp; chr(&amp;H0487), chr(&amp;H2DF1) &amp; chr(&amp;H0487), chr(&amp;H2DF2) &amp; chr(&amp;H0487), chr(&amp;H2DF2) &amp; chr(&amp;H0487), chr(&amp;H2DF3) &amp; chr(&amp;H0487), chr(&amp;H2DF3) &amp; chr(&amp;H0487), chr(&amp;H2DF4) &amp; chr(&amp;H0487), chr(&amp;H2DF4) &amp; chr(&amp;H0487), chr(&amp;H2DF6) &amp; chr(&amp;H0487), chr(&amp;H2DF6) &amp; chr(&amp;H0487), chr(&amp;H2DF7), chr(&amp;H2DF7), chr(&amp;H2DF8), chr(&amp;H2DF8), chr(&amp;H2DF9), chr(&amp;H2DF9), chr(&amp;H2DFA), chr(&amp;H2DFB), chr(&amp;H2DFB), chr(&amp;H2DFC), chr(&amp;H2DFD), chr(&amp;H2DFD), chr(&amp;H2DFE), chr(&amp;H2DFE), chr(&amp;H2DFF), chr(&amp;HA675), chr(&amp;HA675), chr(&amp;H0487), chr(&amp;H0487), chr(&amp;H0482), chr(&amp;HA67E), chr(&amp;H2020), chr(&amp;HA673), chr(&amp;HA673), chr(&amp;H044B) &amp; chr(&amp;HA672), chr(&amp;H2013), chr(&amp;H20DD), chr(&amp;H0488), chr(&amp;H0489), chr(&amp;HA670), chr(&amp;HA671), chr(&amp;H000A) &amp; chr(&amp;H000A), chr(&amp;H000A) &amp; chr(&amp;H000A), chr(&amp;H200B), chr(&amp;H200B), chr(&amp;H034F), chr(&amp;H200D), chr(&amp;H00AD), chr(&amp;H00AB), chr(&amp;H00BB))
+	Convert(aFind, aReplace)
+End Sub
+
+
+</script:module>
