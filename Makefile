@@ -5,5 +5,5 @@ clean:
 
 cuconverter-LO.oxt:
 	rm -f *.oxt
-	zip -rv cuconverter-LO.oxt icons META-INF pkg-desc Ponomar Addons.xcu description.xml LICENSE.txt RULICENSE.txt
+	zip -rv cuconverter-LO.oxt icons META-INF pkg-desc Ponomar Addons.xcu description.xml LICENSE RULICENSE.txt
 
